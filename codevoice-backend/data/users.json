@@ -1,0 +1,42 @@
+{
+  "users": [
+    {
+      "id": "1758002684837",
+      "name": "Alwin",
+      "email": "alwindharsanam.23aid@kongu.edu",
+      "password": "5909daa6fb5cf239d52027367f111ecd9c280866d73f8bd47cda43ef5495af6a",
+      "disability": "",
+      "canType": false,
+      "preferredInputMethod": "",
+      "typingSpeed": "",
+      "additionalNeeds": "",
+      "programmingExperience": "",
+      "preferredLanguages": [],
+      "assistiveTechnologies": {
+        "screenReader": false,
+        "voiceControl": false,
+        "switchControl": false,
+        "other": ""
+      }
+    },
+    {
+      "id": "1758343285982",
+      "name": "Dhiyanesh",
+      "email": "dhiyaneshb.23aid@kongu.edu",
+      "password": "15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225",
+      "disability": "",
+      "canType": false,
+      "preferredInputMethod": "",
+      "typingSpeed": "",
+      "additionalNeeds": "",
+      "programmingExperience": "",
+      "preferredLanguages": [],
+      "assistiveTechnologies": {
+        "screenReader": false,
+        "voiceControl": false,
+        "switchControl": false,
+        "other": ""
+      }
+    }
+  ]
+}

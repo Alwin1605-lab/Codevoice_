@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Commands Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .ready { background-color: #4caf50; }
+        .listening { background-color: #2196f3; }
+        .error { background-color: #f44336; }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #666; cursor: not-allowed; }
+        .commands {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .command-category {
+            margin: 10px 0;
+        }
+        .command-category h4 {
+            color: #90caf9;
+            margin: 5px 0;
+        }
+        .command {
+            background-color: #3d3d3d;
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+        }
+        #last-command {
+            background-color: #2d2d2d;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 20px;
+            font-family: monospace;
+        }
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎤 Voice Commands Test</h1>
+    
+    <div id="status" class="status ready">Ready - Click "Start Listening" to begin</div>
+    
+    <div style="text-align: center;">
+        <button id="start-btn">🎤 Start Listening</button>
+        <button id="stop-btn" disabled>⏹️ Stop Listening</button>
+    </div>
+    
+    <h3>Last Command Heard:</h3>
+    <div id="last-command">None</div>
+    
+    <div class="commands">
+        <h3>📝 Available Voice Commands:</h3>
+        
+        <div class="command-category">
+            <h4>Navigation:</h4>
+            <span class="command">home</span>
+            <span class="command">code generation</span>
+            <span class="command">profile</span>
+            <span class="command">login</span>
+        </div>
+        
+        <div class="command-category">
+            <h4>Actions:</h4>
+            <span class="command">save</span>
+            <span class="command">compile</span>
+            <span class="command">run</span>
+            <span class="command">clear</span>
+            <span class="command">help</span>
+        </div>
+        
+        <div class="command-category">
+            <h4>Voice Control:</h4>
+            <span class="command">stop listening</span>
+            <span class="command">start listening</span>
+        </div>
+    </div>
+
+    <div style="background-color: #2d2d2d; padding: 15px; border-radius: 8px; margin-top: 20px;">
+        <h4>🔧 Troubleshooting Tips:</h4>
+        <ul>
+            <li><strong>Grant microphone permission</strong> when prompted</li>
+            <li><strong>Use Chrome or Edge</strong> browser for best compatibility</li>
+            <li><strong>Speak clearly</strong> and wait for the blue "listening" status</li>
+            <li><strong>Try simple commands</strong> like "help" or "save" first</li>
+        </ul>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const lastCommandEl = document.getElementById('last-command');
+        
+        let recognition = null;
+        let isListening = false;
+
+        function updateStatus(message, type) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            
+            if (type === 'listening') {
+                statusEl.classList.add('pulse');
+            } else {
+                statusEl.classList.remove('pulse');
+            }
+        }
+
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                updateStatus('Speech recognition not supported. Use Chrome or Edge.', 'error');
+                return false;
+            }
+
+            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = () => {
+                updateStatus('🎤 Listening... (Speak now)', 'listening');
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                isListening = true;
+            };
+            
+            recognition.onresult = (event) => {
+                const command = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+                lastCommandEl.textContent = `"${command}"`;
+                
+                // Process command
+                processCommand(command);
+            };
+            
+            recognition.onerror = (event) => {
+                updateStatus(`❌ Error: ${event.error}`, 'error');
+                if (event.error === 'not-allowed') {
+                    updateStatus('❌ Microphone access denied. Please allow and refresh.', 'error');
+                }
+                resetButtons();
+            };
+            
+            recognition.onend = () => {
+                updateStatus('Ready - Click "Start Listening" to begin', 'ready');
+                resetButtons();
+            };
+
+            return true;
+        }
+
+        function resetButtons() {
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            isListening = false;
+        }
+
+        async function processCommand(command) {
+            console.log('Processing:', command);
+            
+            // Simple local commands
+            if (command.includes('stop listening')) {
+                recognition.stop();
+                return;
+            }
+            
+            // Send to backend
+            try {
+                const response = await fetch('http://localhost:8000/commands/execute-voice-command/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `command=${encodeURIComponent(command)}`
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    updateStatus(`✅ Executed: ${command}`, 'ready');
+                    
+                    // Speak feedback
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(`Command executed: ${command}`);
+                        utterance.rate = 0.8;
+                        utterance.volume = 0.7;
+                        speechSynthesis.speak(utterance);
+                    }
+                } else {
+                    updateStatus(`❌ Command failed: ${command}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', async () => {
+            if (!recognition) {
+                updateStatus('❌ Speech recognition not initialized', 'error');
+                return;
+            }
+
+            // Request microphone permission explicitly
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                recognition.start();
+            } catch (error) {
+                updateStatus('❌ Microphone permission required. Please allow and try again.', 'error');
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            if (initSpeechRecognition()) {
+                updateStatus('✅ Ready - Click "Start Listening" to begin', 'ready');
+            }
+        });
+    </script>
+</body>
+</html>
