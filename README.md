@@ -12,7 +12,7 @@ Codevoice_ is an innovative Integrated Development Environment (IDE) designed sp
 - **Voice-Controlled Code Editing**: Control your IDE entirely through voice commands
 - **AI-Powered Code Generation**: Generate code snippets and entire projects using Groq and Google Gemini AI
 - **Real-time Speech Recognition**: Advanced transcription using Whisper models
-- **Multi-language Support**: Support for English, Spanish, French, and German voice commands
+- **Multi-language Support**: Support for English, Tamil and Hindi voice commands
 - **Text-to-Speech Narration**: Audio feedback and code narration capabilities
 
 ### Advanced Features
@@ -113,9 +113,8 @@ Codevoice_ is an innovative Integrated Development Environment (IDE) designed sp
 
 ### Multi-language Commands
 - English: "compile code"
-- Spanish: "compilar código"
-- French: "compiler code"
-- German: "code kompilieren"
+- Tamil: "compilar código"
+- Hindi: "compiler code"
 
 ## API Documentation
 
